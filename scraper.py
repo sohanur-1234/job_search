@@ -176,12 +176,13 @@ def sync_subscribers():
             if not chat_id:
                 continue
 
-            if text.startswith("/start"):
-                subscribers.add(chat_id)
-                send_to_chat(chat_id, "✅ Subscribed! You will now receive RA & research alerts.")
-            elif text.startswith("/stop"):
+            if text.startswith("/stop"):
                 subscribers.discard(chat_id)
                 send_to_chat(chat_id, "🛑 Unsubscribed. Send /start anytime to rejoin.")
+            else:
+                if chat_id not in subscribers:
+                    subscribers.add(chat_id)
+                    send_to_chat(chat_id, "✅ Subscribed! You will now receive RA & research alerts.")
 
         # Acknowledge processed updates so Telegram clears them from the queue
         if max_update_id is not None:
