@@ -79,6 +79,16 @@ TARGET_URLS = [
     {"name": "Predoc.org Global Opportunities", "url": "https://predoc.org/opportunities"},
     {"name": "KAUST Research Jobs (Saudi Arabia)", "url": "https://www.kaust.edu.sa/en/about/working-at-kaust"},
     {"name": "HigherEdJobs Global Research", "url": "https://www.higheredjobs.com/search/advanced_action.cfm?JobCat=24"},
+    # Japan Research Hubs & Top Universities
+    {"name": "JREC-IN Japan (National Research Portal)", "url": "https://jrecin.jst.go.jp/seek/SeekTop?ln=1"},
+    {"name": "RIKEN Research Institute (Japan)", "url": "https://www.riken.jp/en/careers/"},
+    {"name": "University of Tokyo Jobs (Japan)", "url": "https://www.u-tokyo.ac.jp/en/about/jobs.html"},
+    {"name": "Kyoto University Employment (Japan)", "url": "https://www.kyoto-u.ac.jp/en/about/employment"},
+    {"name": "OIST Research Careers (Japan)", "url": "https://www.oist.jp/careers"},
+    {"name": "NII National Institute of Informatics (Japan)", "url": "https://www.nii.ac.jp/en/about/recruit/"},
+    # South Korea Research Hubs & Top Universities
+    {"name": "KAIST Recruitment (South Korea)", "url": "https://news.kaist.ac.kr/newsen/html/news/?skey=category&sval=RECRUITMENT"},
+    {"name": "Seoul National University Notices (South Korea)", "url": "https://www.snu.ac.kr/snunow/notice/genernal"},
 ]
 
 PREFILTER_KEYWORDS = [
@@ -89,6 +99,11 @@ PREFILTER_KEYWORDS = [
     "graduate research",
     "predoc",
     "pre-doc",
+    "project researcher",
+    "special researcher",
+    "student researcher",
+    "laboratory assistant",
+    "lab researcher",
     "machine learning",
     "deep learning",
     "artificial intelligence",
@@ -96,7 +111,6 @@ PREFILTER_KEYWORDS = [
     "biomedical",
     "computer vision",
     "visiting researcher",
-    "student researcher",
     "grant",
     "ra ",
 ]
@@ -107,6 +121,9 @@ LINKEDIN_QUERIES = [
     'site:linkedin.com/posts ("Graduate Research Assistant" OR "Pre-doc" OR "Visiting Researcher") ("Deep Learning" OR "Machine Learning" OR "Biomedical")',
     'site:linkedin.com/posts ("Research Assistant" OR "RA vacancy" OR "funded RA") ("USA" OR "Canada" OR "Germany" OR "UK" OR "Europe" OR "Singapore" OR "Australia")',
     'site:linkedin.com/jobs "Research Assistant" ("Machine Learning" OR "Deep Learning" OR "Computer Science")',
+    # Japan & South Korea focused searches
+    'site:linkedin.com/posts ("Research Assistant" OR "Graduate Research Assistant" OR "Intern" OR "RA") ("Japan" OR "Tokyo" OR "Kyoto" OR "RIKEN" OR "OIST" OR "JREC-IN")',
+    'site:linkedin.com/posts ("Research Assistant" OR "Graduate Research Assistant" OR "Lab" OR "RA") ("South Korea" OR "Korea" OR "KAIST" OR "SNU" OR "POSTECH")',
     # Bangladesh specific
     'site:linkedin.com/posts "Research Assistant" ("BUET" OR "NSU" OR "BRACU" OR "UIU" OR "Dhaka" OR "Bangladesh")',
 ]
