@@ -161,6 +161,9 @@ def sync_subscribers():
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
     try:
         res = requests.get(url, timeout=15).json()
+        if not res.get("ok") and res.get("error_code") == 409:
+            requests.get(f"https://api.telegram.org/bot{BOT_TOKEN}/deleteWebhook", timeout=10)
+            res = requests.get(url, timeout=15).json()
         updates = res.get("result", [])
         max_update_id = None
 
