@@ -146,8 +146,25 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
+def send_recent_opportunities(chat_id, count=3):
+    """Sends latest active circulars to a newly joined subscriber."""
+    opportunities = load_json(OPPORTUNITIES_FILE, [])
+    if not opportunities:
+        return
+    for record in opportunities[:count]:
+        msg = (
+            f"🎯 <b>RA Match ({record.get('score', 7)}/10) — {html.escape(record.get('source', ''))}</b>\n\n"
+            f"📌 <b>Title:</b> {html.escape(record.get('title', '')[:200])}\n"
+            f"📝 <b>Summary:</b> {html.escape(record.get('summary', ''))}\n"
+            f"⏳ <b>Deadline:</b> {html.escape(record.get('deadline', ''))}\n"
+            f"📧 <b>Contact:</b> {html.escape(record.get('contact_email', ''))}\n"
+            f"🔗 <b>Link:</b> {html.escape(record.get('link', ''))}"
+        )
+        send_to_chat(chat_id, msg)
+
+
 def sync_subscribers():
-    """Checks incoming /start or /stop messages and updates subscribers.json."""
+    """Checks incoming messages and updates subscribers.json."""
     subscribers = set(load_json(SUBSCRIBERS_FILE, []))
     if CHAT_ID:
         try:
@@ -182,7 +199,8 @@ def sync_subscribers():
             else:
                 if chat_id not in subscribers:
                     subscribers.add(chat_id)
-                    send_to_chat(chat_id, "✅ Subscribed! You will now receive RA & research alerts.")
+                    send_to_chat(chat_id, "✅ Subscribed! You will now receive RA & research alerts.\n\nHere are recent active opportunities:")
+                    send_recent_opportunities(chat_id, count=3)
 
         # Acknowledge processed updates so Telegram clears them from the queue
         if max_update_id is not None:
@@ -280,7 +298,7 @@ Return ONLY valid JSON with these exact keys:
 """
     try:
         response = None
-        for model_name in ["gemini-3-flash-preview", "gemini-3.8-flash", "gemini-flash-latest"]:
+        for model_name in ["gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-2.5-flash"]:
             try:
                 response = client.models.generate_content(
                     model=model_name,
