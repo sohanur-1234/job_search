@@ -70,6 +70,15 @@ TARGET_URLS = [
     {"name": "BIDS Career", "url": "https://bids.org.bd/page/career"},
     {"name": "BIGD Career", "url": "https://bigd.bracu.ac.bd/careers/"},
     {"name": "BCSIR Notices", "url": "https://bcsir.gov.bd/site/view/notices"},
+    # Worldwide & International Research Boards
+    {"name": "Cambridge Research Jobs (UK)", "url": "https://www.jobs.cam.ac.uk/research/"},
+    {"name": "Imperial College Research (UK)", "url": "https://www.imperial.ac.uk/jobs/"},
+    {"name": "NUS Singapore Research", "url": "https://careers.nus.edu.sg/search/?createNewAlert=false&q=Research+Assistant"},
+    {"name": "TUM Germany Academic Jobs", "url": "https://portal.mytum.de/jobs/wissenschaftler/"},
+    {"name": "EuroScienceJobs RA (Europe)", "url": "https://www.eurosciencejobs.com/jobs/research_assistant"},
+    {"name": "Predoc.org Global Opportunities", "url": "https://predoc.org/opportunities"},
+    {"name": "KAUST Research Jobs (Saudi Arabia)", "url": "https://www.kaust.edu.sa/en/about/working-at-kaust"},
+    {"name": "HigherEdJobs Global Research", "url": "https://www.higheredjobs.com/search/advanced_action.cfm?JobCat=24"},
 ]
 
 PREFILTER_KEYWORDS = [
@@ -77,20 +86,29 @@ PREFILTER_KEYWORDS = [
     "junior research",
     "research associate",
     "research fellow",
+    "graduate research",
+    "predoc",
+    "pre-doc",
     "machine learning",
     "deep learning",
     "artificial intelligence",
     "data science",
     "biomedical",
     "computer vision",
+    "visiting researcher",
+    "student researcher",
     "grant",
     "ra ",
 ]
 
 LINKEDIN_QUERIES = [
+    # Global / Worldwide RA searches
+    'site:linkedin.com/posts ("looking for RA" OR "hiring Research Assistant" OR "Research Assistant position") ("Machine Learning" OR "Deep Learning" OR "Computer Vision" OR "AI")',
+    'site:linkedin.com/posts ("Graduate Research Assistant" OR "Pre-doc" OR "Visiting Researcher") ("Deep Learning" OR "Machine Learning" OR "Biomedical")',
+    'site:linkedin.com/posts ("Research Assistant" OR "RA vacancy" OR "funded RA") ("USA" OR "Canada" OR "Germany" OR "UK" OR "Europe" OR "Singapore" OR "Australia")',
+    'site:linkedin.com/jobs "Research Assistant" ("Machine Learning" OR "Deep Learning" OR "Computer Science")',
+    # Bangladesh specific
     'site:linkedin.com/posts "Research Assistant" ("BUET" OR "NSU" OR "BRACU" OR "UIU" OR "Dhaka" OR "Bangladesh")',
-    'site:linkedin.com/posts ("looking for RA" OR "hiring RA" OR "Research Assistant") ("Machine Learning" OR "Deep Learning" OR "AI") Bangladesh',
-    'site:linkedin.com/jobs "Research Assistant" Bangladesh',
 ]
 
 HEADERS = {
