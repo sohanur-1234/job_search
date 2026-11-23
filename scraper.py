@@ -26,6 +26,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 SEEN_FILE = "seen_links.json"
 OPPORTUNITIES_FILE = "opportunities.json"
+SUBSCRIBERS_FILE = "subscribers.json"
 
 CANDIDATE_PROFILE = """
 - Education: B.Sc. in Computer Science & Engineering (CSE), Islamic University, Bangladesh.
@@ -145,21 +146,75 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 
-def send_telegram_message(text):
-    if not BOT_TOKEN or not CHAT_ID:
-        print("Telegram credentials missing!")
-        return
+def sync_subscribers():
+    """Checks incoming /start or /stop messages and updates subscribers.json."""
+    subscribers = set(load_json(SUBSCRIBERS_FILE, []))
+    if CHAT_ID:
+        try:
+            subscribers.add(int(CHAT_ID))
+        except (ValueError, TypeError):
+            subscribers.add(CHAT_ID)
+
+    if not BOT_TOKEN:
+        return list(subscribers)
+
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates"
+    try:
+        res = requests.get(url, timeout=15).json()
+        updates = res.get("result", [])
+        max_update_id = None
+
+        for upd in updates:
+            max_update_id = upd["update_id"]
+            msg = upd.get("message", {})
+            chat_id = msg.get("chat", {}).get("id")
+            text = (msg.get("text") or "").strip().lower()
+
+            if not chat_id:
+                continue
+
+            if text.startswith("/start"):
+                subscribers.add(chat_id)
+                send_to_chat(chat_id, "✅ Subscribed! You will now receive RA & research alerts.")
+            elif text.startswith("/stop"):
+                subscribers.discard(chat_id)
+                send_to_chat(chat_id, "🛑 Unsubscribed. Send /start anytime to rejoin.")
+
+        # Acknowledge processed updates so Telegram clears them from the queue
+        if max_update_id is not None:
+            requests.get(url, params={"offset": max_update_id + 1}, timeout=10)
+    except Exception as e:
+        print(f"Subscriber sync error: {e}")
+
+    subscriber_list = sorted(list(subscribers))
+    save_json(SUBSCRIBERS_FILE, subscriber_list)
+    return subscriber_list
+
+
+def send_to_chat(chat_id, text):
     api_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
-        "chat_id": CHAT_ID,
+        "chat_id": chat_id,
         "text": text[:4000],
         "parse_mode": "HTML",
         "disable_web_page_preview": True,
     }
     try:
-        requests.post(api_url, json=payload, timeout=15)
+        res = requests.post(api_url, json=payload, timeout=15)
+        # Remove user if they blocked the bot (HTTP 403)
+        if res.status_code == 403:
+            subs = set(load_json(SUBSCRIBERS_FILE, []))
+            subs.discard(chat_id)
+            save_json(SUBSCRIBERS_FILE, sorted(list(subs)))
     except Exception as e:
-        print(f"Telegram error: {e}")
+        print(f"Telegram send error for {chat_id}: {e}")
+
+
+def broadcast_message(text, subscribers):
+    if not BOT_TOKEN:
+        return
+    for chat_id in subscribers:
+        send_to_chat(chat_id, text)
 
 
 def extract_link_details(url):
@@ -307,6 +362,7 @@ def search_google_linkedin():
 
 
 def main():
+    subscribers = sync_subscribers()
     seen_links = set(load_json(SEEN_FILE, []))
     opportunities = load_json(OPPORTUNITIES_FILE, [])
     candidates = []
@@ -351,20 +407,20 @@ def main():
             f"📧 <b>Contact:</b> {html.escape(record['contact_email'])}\n"
             f"🔗 <b>Link:</b> {html.escape(record['link'])}"
         )
-        send_telegram_message(msg)
+        broadcast_message(msg, subscribers)
 
         if analysis.get("cold_email"):
             email_msg = (
                 f"✉️ <b>Ready-to-Send Cold Email Draft:</b>\n\n"
                 f"<pre>{html.escape(analysis['cold_email'])}</pre>"
             )
-            send_telegram_message(email_msg)
+            broadcast_message(email_msg, subscribers)
 
         sent_count += 1
 
     save_json(SEEN_FILE, sorted(list(seen_links)))
     save_json(OPPORTUNITIES_FILE, opportunities[:200])
-    print(f"Processed {len(candidates)} new links; sent {sent_count} relevant alerts.")
+    print(f"Processed {len(candidates)} new links; sent {sent_count} relevant alerts to {len(subscribers)} subscribers.")
 
 
 if __name__ == "__main__":
